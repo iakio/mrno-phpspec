@@ -20,4 +20,12 @@ class TimedCacheSpec extends ObjectBehavior
         $loader->load($key)->shouldBeCalled()->willReturn($value);
         $this->lookup($key)->shouldReturn($value);
     }
+
+    function it_should_not_reload_object_that_is_cached(Loader $loader)
+    {
+        $key = "key"; $value = "value";
+        $loader->load($key)->shouldBeCalledTimes(1)->willReturn($value);
+        $this->lookup($key)->shouldReturn($value);
+        $this->lookup($key)->shouldReturn($value);
+    }
 }
