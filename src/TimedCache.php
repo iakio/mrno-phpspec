@@ -6,11 +6,11 @@ class TimedCache
 
     public function __construct(Loader $loader)
     {
-        // TODO: write logic here
+        $this->loader = $loader;
     }
 
-    public function lookup($argument1)
+    public function lookup($key)
     {
-        // TODO: write logic here
+        return $this->loader->load($key);
     }
 }
