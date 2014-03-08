@@ -3,28 +3,42 @@
 namespace spec;
 
 use Loader;
+use Clock;
+use ReloadPolicy;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
 class TimedCacheSpec extends ObjectBehavior
 {
-    function let(Loader $loader)
+    function let(Loader $loader, Clock $clock, ReloadPolicy $reloadPolicy)
     {
-        $this->beConstructedWith($loader);
+        $this->beConstructedWith($loader, $clock, $reloadPolicy);
         $this->shouldHaveType('TimedCache');
     }
 
-    function it_loads_object_that_is_not_cached(Loader $loader)
+    function it_returns_cached_object_within_timeout(Loader $loader, Clock $clock, ReloadPolicy $reloadPolicy)
     {
         $key = "key"; $value = "value";
-        $loader->load($key)->shouldBeCalled()->willReturn($value);
-        $this->lookup($key)->shouldReturn($value);
-    }
+        $loadTime = new \DateTime("2014-01-01");
+        $fetchTime = new \DateTime("2014-02-01");
 
-    function it_should_not_reload_object_that_is_cached(Loader $loader)
-    {
-        $key = "key"; $value = "value";
-        $loader->load($key)->shouldBeCalledTimes(1)->willReturn($value);
+        $clock->getCurrentTime()
+            ->shouldBeCalledTimes(1)
+            ->will(function () use ($loadTime, $fetchTime) {
+                $this->getCurrentTime()
+                    ->shouldBeCalled(1)
+                    ->willReturn($fetchTime);
+                return $loadTime;
+            });
+
+        $reloadPolicy->shouldReload($loadTime, $fetchTime)
+            ->shouldBeCalled()
+            ->willReturn(false);
+
+        $loader->load($key)
+            ->shouldBeCalledTimes(1)
+            ->willReturn($value);
+
         $this->lookup($key)->shouldReturn($value);
         $this->lookup($key)->shouldReturn($value);
     }
