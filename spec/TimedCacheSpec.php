@@ -8,8 +8,9 @@ use Prophecy\Argument;
 
 class TimedCacheSpec extends ObjectBehavior
 {
-    function it_is_initializable()
+    function let(Loader $loader)
     {
+        $this->beConstructedWith($loader);
         $this->shouldHaveType('TimedCache');
     }
 
