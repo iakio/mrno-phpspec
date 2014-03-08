@@ -23,13 +23,7 @@ class TimedCacheSpec extends ObjectBehavior
         $fetchTime = new \DateTime("2014-02-01");
 
         $clock->getCurrentTime()
-            ->shouldBeCalledTimes(1)
-            ->will(function () use ($loadTime, $fetchTime) {
-                $this->getCurrentTime()
-                    ->shouldBeCalled(1)
-                    ->willReturn($fetchTime);
-                return $loadTime;
-            });
+            ->willThrow(new \Exception("Clock#getCurrentTime() was called before Loader#load()"));
 
         $reloadPolicy->shouldReload($loadTime, $fetchTime)
             ->shouldBeCalled()
@@ -37,7 +31,18 @@ class TimedCacheSpec extends ObjectBehavior
 
         $loader->load($key)
             ->shouldBeCalledTimes(1)
-            ->willReturn($value);
+            ->will(function () use ($value, $clock, $loadTime, $fetchTime) {
+                $clock->getCurrentTime()
+                    ->shouldBeCalledTimes(1)
+                    ->will(function () use ($loadTime, $fetchTime) {
+                        $this->getCurrentTime()
+                            ->shouldBeCalled(1)
+                            ->willReturn($fetchTime);
+
+                        return $loadTime;
+                    });
+                return $value;
+            });
 
         $this->lookup($key)->shouldReturn($value);
         $this->lookup($key)->shouldReturn($value);
