@@ -1,0 +1,22 @@
+{
+  "name": "mrno-phpspec",
+  "version": "0.0.0",
+  "description": "mrno-phpspec ============",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/iakio/mrno-phpspec.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/iakio/mrno-phpspec/issues"
+  },
+  "devDependencies": {
+    "gulp": "~3.5.5",
+    "growly": "~1.1.1"
+  }
+}

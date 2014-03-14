@@ -2,3 +2,4 @@ composer.phar
 bin/
 vendor/
 *.swp
+node_modules/
