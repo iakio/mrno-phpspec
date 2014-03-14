@@ -22,6 +22,8 @@ class TimedCacheSpec extends ObjectBehavior
         $loadTime = new \DateTime("2014-01-01");
         $fetchTime = new \DateTime("2014-02-01");
 
+        $currentTimes = [$loadTime, $fetchTime];
+
         $clock->getCurrentTime()
             ->willThrow(new \Exception("Clock#getCurrentTime() was called before Loader#load()"));
 
@@ -31,15 +33,11 @@ class TimedCacheSpec extends ObjectBehavior
 
         $loader->load($key)
             ->shouldBeCalledTimes(1)
-            ->will(function () use ($value, $clock, $loadTime, $fetchTime) {
+            ->will(function () use ($value, $clock, &$currentTimes) {
                 $clock->getCurrentTime()
-                    ->shouldBeCalledTimes(1)
-                    ->will(function () use ($loadTime, $fetchTime) {
-                        $this->getCurrentTime()
-                            ->shouldBeCalled(1)
-                            ->willReturn($fetchTime);
-
-                        return $loadTime;
+                    ->shouldBeCalledTimes(2)
+                    ->will(function () use (&$currentTimes) {
+                        return array_shift($currentTimes);
                     });
                 return $value;
             });
